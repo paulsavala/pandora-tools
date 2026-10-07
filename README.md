@@ -113,3 +113,47 @@ pytest
 ```
 
 Tests use four sample files in `tests/data` and a fake API (no network needed).
+
+## Contributing
+
+### 1. Set up a local copy
+
+```bash
+git clone https://github.com/paulsavala/pandora-tools.git
+cd pandora-tools
+python -m venv .venv && source .venv/bin/activate     # or conda, if you prefer
+pip install -e ".[test]"
+pytest                                                # everything should pass before you change anything
+```
+
+`-e` (editable) means your edits take effect without reinstalling.
+
+### 2. If you use a coding assistant (Claude Code, Codex, Cursor, ...)
+
+The repo has a guide written for coding agents: **`AGENTS.md`**. It covers the
+layout, the rules that must not break (e.g. short column names are public and
+never renamed), style, and how to test. `CLAUDE.md` simply imports it.
+
+- **Start the assistant from the repo root** (the folder with `pyproject.toml`).
+  Claude Code reads `CLAUDE.md` automatically; Codex and many others read
+  `AGENTS.md`. If yours reads neither, make your first message
+  *"Read AGENTS.md before doing anything."*
+- **Ask it to orient first, not code first.** A good opening prompt:
+  *"Read AGENTS.md and README.md, run the tests, and summarize how a file goes
+  from raw text to a PandoraFrame. Don't change anything yet."*
+- **Work on a branch**, one focused change at a time, and have the assistant
+  run `pytest` before it says it's done. Bug fixes and new column names should
+  come with a test (AGENTS.md explains how).
+- **The live API usually isn't reachable from an assistant's sandbox.** For
+  changes to `client.py`, ask the assistant for a short snippet, run it yourself
+  in Colab, and paste the result back.
+- **Review the diff yourself** before committing. Watch especially for renamed
+  columns, new dependencies, and changes to what gets turned into NaN.
+- When a change alters how things work (a new rule, a new module), ask the
+  assistant to update `AGENTS.md` and this README in the same PR.
+
+### 3. Submit
+
+Push your branch and open a pull request against `main` describing what changed
+and how you tested it. Releases are tagged (`v0.1.0`, ...) so notebooks that pin
+a version keep working.
