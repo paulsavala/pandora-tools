@@ -10,6 +10,7 @@ shorter or safer, never more surprising.
 
 | Path | Role |
 |---|---|
+| `pandora_tools/data/products.csv` | Product code → plain-language description (`KNOWN_PRODUCTS`). Edited by non-developers; keep it a plain 2-column CSV. |
 | `pandora_tools/parser.py` | Raw file → tables. Header parsing, column naming (`_NAME_RULES`), missing-value codes, ragged rows → profiles. No pandas subclass, no network. |
 | `pandora_tools/frame.py` | `PandoraFrame` (DataFrame subclass) and its methods; `concat`, `merge_products`. |
 | `pandora_tools/reader.py` | `read()` / `read_bytes()`: wraps parser output into a `PandoraFrame`. |

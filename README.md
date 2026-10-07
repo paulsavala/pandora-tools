@@ -105,6 +105,29 @@ automatically (first match wins); `client` prints which one it picked:
 Files are written via a temporary file and a rename, so two people downloading
 the same day at once can't corrupt the cache. `refresh=True` re-downloads.
 
+## Product descriptions
+
+`client.products(...)`, `client.catalog(...)` and `pdt.KNOWN_PRODUCTS` show a
+plain-language description next to each product code (`rnvh3` → "Nitrogen
+dioxide + water vapor, sky scans ..."). These come from
+[`pandora_tools/data/products.csv`](pandora_tools/data/products.csv), a
+two-column table you can edit without touching any Python:
+
+```
+product,description
+rnvh3,"Nitrogen dioxide + water vapor, sky scans (surface conc., tropospheric column, profile)"
+rfus5,"Formaldehyde, direct sun (total column)"
+```
+
+- Open it in Excel, Google Sheets or any text editor and add a row; save as CSV
+  (UTF-8). Keep the header line `product,description` as it is.
+- Product codes are lowercase letters then digits (`rnvh3`), one row per code.
+- In a text editor, put a description that contains commas in double quotes.
+- Products missing from the table still download and read fine; they just show
+  an empty description.
+- Run `pytest` (or open a PR and let a maintainer run it): it checks the file and
+  says which line to fix if something is off.
+
 ## Tests
 
 ```

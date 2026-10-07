@@ -20,6 +20,7 @@ layers go into a separate long-format profile table.
 
 from __future__ import annotations
 
+import csv
 import io
 import os
 import re
@@ -47,15 +48,50 @@ SPECIES = {
     "oxygen dimer": "o2o2",
 }
 
-# Product codes we have seen, with a plain-language description.
+# Product codes we have seen, with a plain-language description. They live in
+# data/products.csv so anyone can add one in a spreadsheet editor.
 # Unknown codes still work; they just have no description.
-KNOWN_PRODUCTS = {
-    "rnvh3": "Nitrogen dioxide + water vapor, sky scans (surface conc., tropospheric column, profile)",
-    "rfuh5": "Formaldehyde, sky scans (surface conc., tropospheric column, profile)",
-    "rfus5": "Formaldehyde, direct sun (total column)",
-    "rnvs3": "Nitrogen dioxide, direct sun (total column)",
-    "rout2": "Ozone, direct sun (total column)",
-}
+PRODUCTS_FILE = Path(__file__).parent / "data" / "products.csv"
+
+
+def load_known_products(path: Union[str, os.PathLike] = PRODUCTS_FILE) -> Dict[str, str]:
+    """Read the product-code descriptions table (``product,description`` CSV).
+
+    Returns a dict such as ``{"rnvh3": "Nitrogen dioxide + water vapor, sky scans ..."}``.
+    Raises ``ValueError`` naming the bad line if the file is malformed.
+    """
+    products: Dict[str, str] = {}
+    # utf-8-sig: Excel adds a byte-order mark when saving as CSV
+    with open(path, newline="", encoding="utf-8-sig") as f:
+        rows = csv.reader(f)
+        header = [h.strip().lower() for h in next(rows, [])]
+        if header != ["product", "description"]:
+            raise ValueError(f"{path}: the first line must be exactly 'product,description'.")
+        for row in rows:
+            line = rows.line_num
+            cells = [c.strip() for c in row]
+            if not any(cells):
+                continue  # blank line
+            if len(cells) != 2:
+                raise ValueError(
+                    f"{path}, line {line}: expected 2 cells (product, description), got {len(cells)}. "
+                    "Put descriptions that contain commas in double quotes."
+                )
+            code, desc = cells
+            if not re.fullmatch(r"[a-z]+\d+", code):
+                raise ValueError(
+                    f"{path}, line {line}: product code {code!r} should look like 'rnvh3' "
+                    "(lowercase letters, then digits)."
+                )
+            if not desc:
+                raise ValueError(f"{path}, line {line}: product {code!r} has no description.")
+            if code in products:
+                raise ValueError(f"{path}, line {line}: product {code!r} is listed twice.")
+            products[code] = desc
+    return products
+
+
+KNOWN_PRODUCTS = load_known_products()
 
 STATION_COLUMNS = [
     "location", "instrument", "spectrometer", "product",
