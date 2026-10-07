@@ -13,6 +13,11 @@ no2 = no2.filter_quality("no2")                  # flags 0, 1, 10, 11
 no2[["local_time", "no2_surf_conc", "no2_trop_col"]].head()
 ```
 
+**New to Python or to this data?** Open
+[`examples/getting_started.ipynb`](examples/getting_started.ipynb) in Google Colab
+(File → Upload notebook) and run it top to bottom. It downloads, plots and saves
+one day of data, and you only edit one settings cell.
+
 ## Install
 
 Every notebook starts with one cell (Colab starts a fresh machine each session):

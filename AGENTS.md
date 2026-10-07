@@ -18,6 +18,7 @@ shorter or safer, never more surprising.
 | `pandora_tools/cache.py` | Download-cache location rules and atomic writes. |
 | `tests/` | pytest. `tests/data/` holds four real PGN L2 files (three products). |
 | `examples/quickstart.ipynb` | The canonical end-to-end workflow; keep it working. |
+| `examples/getting_started.ipynb` | Step-by-step notebook for beginners: one settings cell, plain-language explanations. Keep it working and jargon-free. |
 
 Keep this layering: `parser` knows nothing about the API or the subclass;
 `client` uses `reader`, never re-implements parsing.
