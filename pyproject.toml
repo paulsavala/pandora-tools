@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pandora-tools"
+version = "0.1.0"
+description = "Read, browse and download NASA / Pandonia Global Network Pandora L2 data as pandas DataFrames"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = ["pandas>=1.5", "numpy", "requests"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools]
+packages = ["pandora_tools"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
