@@ -18,7 +18,7 @@ no2[["local_time", "no2_surf_conc", "no2_trop_col"]].head()
 Every notebook starts with one cell (Colab starts a fresh machine each session):
 
 ```python
-!pip install -q git+https://github.com/<you>/pandora-tools.git
+!pip install -q git+https://github.com/paulsavala/pandora-tools.git
 ```
 
 Pin a version so a notebook keeps working when the code changes:
