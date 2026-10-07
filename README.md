@@ -21,35 +21,8 @@ Every notebook starts with one cell (Colab starts a fresh machine each session):
 !pip install -q git+https://github.com/paulsavala/pandora-tools.git
 ```
 
-Pin a version so a notebook keeps working when the code changes:
-`...pandora-tools.git@v0.1.0`.
-
-If the code lives in a Google shared drive instead of GitHub:
-
-```python
-from google.colab import drive; drive.mount("/content/drive")
-!pip install -q "/content/drive/Shareddrives/<Drive name>/pandora-tools"
-```
-
-On a laptop, install once into your environment (`pip install -e <path or git URL>`),
+On a laptop, install once into your environment (`pip install -q git+https://github.com/paulsavala/pandora-tools.git`),
 then just `import pandora_tools` in any notebook.
-
-## Where downloaded files go
-
-Downloads can always be fetched again, so the folder is just a cache. It's chosen
-automatically (first match wins); `client` prints which one it picked:
-
-1. `PandoraClient(cache_dir=...)`
-2. the `PANDORA_DATA_DIR` environment variable
-3. **a shared drive that has a `pandora_cache` folder**:
-   `/content/drive/Shareddrives/<any drive>/pandora_cache`. Create that folder once
-   in the group's shared drive and everyone with Drive mounted shares one cache,
-   whatever their own Drive layout.
-4. `/content/pandora_cache` on Colab (cleared when the session ends)
-5. `~/.cache/pandora_tools` on a laptop
-
-Files are written via a temporary file and a rename, so two people downloading
-the same day at once can't corrupt the cache. `refresh=True` re-downloads.
 
 ## Finding data
 
@@ -114,6 +87,23 @@ pdt.merge_products(hcho, no2, tolerance="2min")          # nearest match, if tim
 
 `merge_products` reports how many rows matched. Columns both products have (geometry,
 fit residuals, L1 flags) get a product suffix (`sza_rfuh5`, `sza_rnvh3`).
+
+## Where downloaded files go
+
+Downloads can always be fetched again, so the folder is just a cache. It's chosen
+automatically (first match wins); `client` prints which one it picked:
+
+1. `PandoraClient(cache_dir=...)`
+2. the `PANDORA_DATA_DIR` environment variable
+3. **a shared drive that has a `pandora_cache` folder**:
+   `/content/drive/Shareddrives/<any drive>/pandora_cache`. Create that folder once
+   in the group's shared drive and everyone with Drive mounted shares one cache,
+   whatever their own Drive layout.
+4. `/content/pandora_cache` on Colab (cleared when the session ends)
+5. `~/.cache/pandora_tools` on a laptop
+
+Files are written via a temporary file and a rename, so two people downloading
+the same day at once can't corrupt the cache. `refresh=True` re-downloads.
 
 ## Tests
 
