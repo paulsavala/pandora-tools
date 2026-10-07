@@ -106,10 +106,36 @@ Browsing: `/files/locations` → `/files/{location}` (instruments, `pan_id`) →
 Download: `/download/{filename}`. The `end` parameter is inclusive of that
 day's file; `list_files` filters to the requested UTC dates itself.
 
-## Git
+## Git and pull requests
 
-- Branch from `main`; small focused PRs with a clear description.
-- Bump `version` in `pyproject.toml` and tag (`vX.Y.Z`) for releases; notebooks
-  pin tags, so tagged releases must stay installable.
+Every change reaches `main` through a pull request reviewed by a maintainer.
+Agents must not push or merge to `main` themselves.
+
+1. Update `main`, then branch from it with a short descriptive name
+   (`fix-hcho-qa-mask`, `add-so2-column-rules`). One focused change per branch.
+2. Make the change with tests (see Testing). A PR without tests is incomplete
+   unless it only touches docs or `pandora_tools/data/products.csv`.
+3. Run `pytest` and make sure everything passes before opening the PR
+   (both pandas 2.2 and 3 if the change touches dtypes, datetimes or the subclass).
+4. Update `README.md` and this file in the same PR when the change alters the
+   public API, a rule here, or the file layout.
+5. Open the PR against `main` (`gh pr create`) with a description containing:
+   - **What changed**: a few sentences, in terms a researcher would understand.
+   - **Why**: the bug, request or issue it addresses (link the issue if there is one).
+   - **How it was tested**: new/changed tests and the `pytest` result, including
+     pandas versions where relevant.
+   - **User-visible effects**: new or changed column names, values that are now
+     (or no longer) masked to NaN, changed defaults or errors. Write "none" if none.
+     Renaming an existing column name is not allowed (see Invariants).
+   - **New dependencies**: none, unless a maintainer approved one beforehand.
+   - **Live API check** (only if `client.py` changed): a short Colab snippet a
+     human can run, since the API can't be reached from CI or most sandboxes.
+6. Leave the PR for a maintainer to review and merge; address review comments
+   with new commits on the same branch.
+
+Other rules:
+
 - Don't commit build artifacts (`*.egg-info`, `build/`) or downloaded data
   beyond the small samples in `tests/data`.
+- Releases are done by a maintainer: bump `version` in `pyproject.toml` and tag
+  (`vX.Y.Z`). Notebooks pin tags, so tagged releases must stay installable.
