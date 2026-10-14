@@ -140,3 +140,27 @@ Other rules:
   beyond the small samples in `tests/data`.
 - Releases are done by a maintainer: bump `version` in `pyproject.toml` and tag
   (`vX.Y.Z`). Notebooks pin tags, so tagged releases must stay installable.
+
+## Docstring & API Documentation Standards
+
+All Python code in this repository must maintain complete and standardized docstrings to support automated API documentation via `pdoc`.
+
+### 1. Style & Format
+- **Format:** Follow **NumPy Style** docstrings across all Python modules (consistent with repository code style).
+- **Tone:** Write docstrings for a scientist, not a software engineer—explain clearly what comes back and in what units or time zone. Use imperative, present-tense phrasing (e.g., "Calculates the total...", "Returns the parsed object...").
+
+### 2. Coverage Requirements
+- **Modules:** Every file must begin with a top-level module docstring explaining its purpose and main components.
+- **Classes:** Must include a high-level summary and an `Attributes:` section listing all public instance/class attributes with their types and descriptions.
+- **Functions & Methods:** All public functions, methods, and initializers (`__init__`) must include docstrings containing:
+  - Concise single-line summary.
+  - Detailed description (if non-trivial).
+  - `Parameters` section specifying parameter names, types, and descriptions.
+  - `Returns` section detailing the return value type and meaning.
+  - `Raises` section documenting explicitly raised exceptions.
+
+### 3. Verification & Local Testing
+Verify your changes locally before submitting a PR by running:
+```bash
+pip install pdoc
+pdoc --html --output-dir docs pandora_tools
