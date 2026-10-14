@@ -6,7 +6,7 @@
 """
 from .cache import resolve_cache_dir
 from .client import PandoraClient
-from .frame import PandoraFrame, QUALITY_FLAG_MEANINGS, concat, merge_products
+from .frame import QUALITY_FLAG_MEANINGS, PandoraFrame, concat, merge_products
 from .parser import KNOWN_PRODUCTS, SPECIES
 from .reader import read, read_bytes
 

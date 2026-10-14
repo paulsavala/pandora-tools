@@ -6,10 +6,9 @@ import re
 import warnings
 from typing import Dict, Iterable, List, Optional, Sequence, Union
 
-import numpy as np
 import pandas as pd
 
-from .parser import SPECIES, STATION_COLUMNS, species_abbr
+from .parser import species_abbr
 
 # L2 quality flags: 0/1/2 = assured high/medium/low, 10/11/12 = not-assured
 # high/medium/low, 20/21/22 = unusable high/medium/low.
@@ -190,7 +189,7 @@ class PandoraFrame(pd.DataFrame):
             flat = flat.reset_index(level=idx_names)
         if "utc_time" not in flat.columns:
             warnings.warn("This frame has no utc_time column or index level, so profiles cannot be "
-                          "matched to its rows; returning all profiles.")
+                          "matched to its rows; returning all profiles.", stacklevel=2)
             return prof
         keys = [k for k in PROFILE_KEYS if k in flat.columns and k in prof.columns]
         present = pd.MultiIndex.from_frame(flat[keys].drop_duplicates())

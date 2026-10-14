@@ -1,0 +1,101 @@
+# Checks every pull request and every push to main.
+#
+# In the repo's branch rules for main, require the status check
+# "all tests pass": it is green only when every job below succeeded.
+name: tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:        # lets you re-run it by hand from the Actions tab
+
+permissions:
+  contents: read
+
+# If someone pushes again to the same pull request, cancel the older run.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }}, ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false      # show every failing combination, not just the first
+      matrix:
+        include:
+          - python: "3.9"
+            pandas: "pandas>=2.2,<2.3"
+            label: "oldest supported Python"
+          - python: "3.12"
+            pandas: "pandas>=2.2,<2.3"
+            label: "pandas 2.2 (like Colab)"
+            coverage: true
+          - python: "3.13"
+            pandas: "pandas>=3,<4"
+            label: "pandas 3"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      # A regular (non-editable) install, the same way researchers install from
+      # GitHub. Tests then run against the installed copy, which also catches
+      # files missing from the package (e.g. pandora_tools/data/products.csv).
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "${{ matrix.pandas }}" ".[test]"
+
+      - name: Show versions
+        working-directory: ${{ runner.temp }}    # outside the repo, so this shows the installed copy
+        run: python -c "import sys, pandas, numpy, pandora_tools; print(sys.version); print('pandas', pandas.__version__, '| numpy', numpy.__version__); print('pandora_tools from', pandora_tools.__file__)"
+
+      - name: Run tests
+        if: ${{ !matrix.coverage }}
+        run: pytest -q
+
+      # On one combination, also measure coverage. Fails if total coverage falls
+      # below fail_under in pyproject.toml. The table appears on the run's Summary page.
+      - name: Run tests with coverage
+        if: ${{ matrix.coverage }}
+        run: pytest -q --cov --cov-report=term
+
+      - name: Coverage summary
+        if: ${{ matrix.coverage && always() }}
+        run: |
+          echo "## Test coverage" >> "$GITHUB_STEP_SUMMARY"
+          python -m coverage report --format=markdown >> "$GITHUB_STEP_SUMMARY" || true
+
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install "ruff>=0.17,<0.18"
+      # Rules are set in pyproject.toml. Fix most findings locally with: ruff check --fix
+      - run: ruff check --output-format=github .
+
+  # The single check to require in branch rules. Add or rename jobs above
+  # without touching the branch settings; just list them under `needs`.
+  all-tests-pass:
+    name: all tests pass
+    if: ${{ always() }}
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check that every job succeeded
+        run: |
+          echo "test: ${{ needs.test.result }}, lint: ${{ needs.lint.result }}"
+          [ "${{ needs.test.result }}" = "success" ] && [ "${{ needs.lint.result }}" = "success" ]

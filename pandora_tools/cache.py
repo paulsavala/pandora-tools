@@ -17,7 +17,6 @@ from __future__ import annotations
 import glob
 import os
 import sys
-import tempfile
 import uuid
 import warnings
 from pathlib import Path
@@ -43,7 +42,7 @@ def resolve_cache_dir(explicit: Optional[os.PathLike] = None) -> Tuple[Path, str
     if shared:
         if len(shared) > 1:
             warnings.warn(f"Several shared-drive caches found {shared}; using {shared[0]}. "
-                          f"Set {ENV_VAR} or cache_dir= to choose.")
+                          f"Set {ENV_VAR} or cache_dir= to choose.", stacklevel=2)
         return Path(shared[0]), "shared drive"
     if in_colab():
         return Path("/content") / CACHE_FOLDER_NAME, "Colab local disk (temporary)"

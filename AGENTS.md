@@ -84,10 +84,21 @@ Keep this layering: `parser` knows nothing about the API or the subclass;
 ## Testing
 
 ```bash
-pip install -e ".[test]"
-pytest
+pip install -e ".[dev]"        # pytest, pytest-cov and ruff
+pytest                         # run the tests
+ruff check .                   # lint; `ruff check --fix .` fixes most findings
+pytest --cov                   # tests + coverage report (fails below the floor)
 ```
 
+- CI (`.github/workflows/tests.yml`) runs on every pull request: the tests on
+  three Python/pandas combinations (3.9 + pandas 2.2, 3.12 + pandas 2.2,
+  3.13 + pandas 3), ruff, and a coverage floor (`fail_under` in
+  `pyproject.toml`). A PR can't merge until the `all tests pass` check is green.
+- CI tests a normal (non-editable) install, so a new data file must be listed
+  under `[tool.setuptools.package-data]` or CI will fail.
+- Don't make CI pass by weakening it: no lowering `fail_under`, removing ruff
+  rules, adding `# noqa`, or skipping tests without a maintainer's approval.
+  Fix the code or add the missing test instead.
 - Every bug fix gets a regression test; every new column rule gets a test that
   checks the name against the raw file's `Column N` value.
 - Tests must not use the network. The client is tested by replacing
@@ -116,8 +127,9 @@ Agents must not push or merge to `main` themselves.
    (`fix-hcho-qa-mask`, `add-so2-column-rules`). One focused change per branch.
 2. Make the change with tests (see Testing). A PR without tests is incomplete
    unless it only touches docs or `pandora_tools/data/products.csv`.
-3. Run `pytest` and make sure everything passes before opening the PR
+3. Run `pytest` and `ruff check .` and make sure both pass before opening the PR
    (both pandas 2.2 and 3 if the change touches dtypes, datetimes or the subclass).
+   CI re-checks this on the PR; if it goes red, read the failing job's log and fix it.
 4. Update `README.md` and this file in the same PR when the change alters the
    public API, a rule here, or the file layout.
 5. Open the PR against `main` (`gh pr create`) with a description containing:
