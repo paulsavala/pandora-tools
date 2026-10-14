@@ -11,7 +11,8 @@ requires-python = ">=3.9"
 dependencies = ["pandas>=1.5", "numpy", "requests"]
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = ["pytest", "pytest-cov"]
+dev = ["pandora-tools[test]", "ruff>=0.17,<0.18"]
 
 [tool.setuptools]
 packages = ["pandora_tools"]
@@ -21,3 +22,29 @@ testpaths = ["tests"]
 
 [tool.setuptools.package-data]
 pandora_tools = ["data/*.csv"]
+
+[tool.coverage.run]
+# Measure the *installed* package by import name (CI tests a normal install).
+source_pkgs = ["pandora_tools"]
+
+[tool.coverage.paths]
+# Report installed-package paths as repo paths (pandora_tools/parser.py, ...).
+source = ["pandora_tools/", "*/site-packages/pandora_tools/"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+# CI fails if total coverage drops below this. Raise it as tests improve.
+fail_under = 85
+
+[tool.ruff]
+target-version = "py39"          # keep in step with requires-python
+line-length = 110
+extend-exclude = ["examples"]    # notebooks are teaching material; not linted
+
+[tool.ruff.lint]
+# A focused set that catches real mistakes, not style preferences:
+#   E4/E7/E9 + F : pyflakes and syntax (unused imports, undefined names, ...)
+#   B            : bugbear (likely bugs, e.g. mutable default arguments)
+#   I            : import sorting (auto-fixable with `ruff check --fix`)
+select = ["E4", "E7", "E9", "F", "B", "I"]

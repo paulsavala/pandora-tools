@@ -15,8 +15,8 @@ LAPORTE = DATA / "Pandora63s1_LaPorteTX_L2_rnvh3p1-8_gg5WZXpKyH4kCjvdYRAN.txt"  
 
 def raw_rows(path):
     lines = path.read_text(encoding="utf-8").splitlines()
-    seps = [i for i, l in enumerate(lines) if l.startswith("-----")]
-    return [l.split() for l in lines[seps[1] + 1:] if l.strip()]
+    seps = [i for i, line in enumerate(lines) if line.startswith("-----")]
+    return [line.split() for line in lines[seps[1] + 1:] if line.strip()]
 
 
 @pytest.mark.parametrize("path, n_rows", [(HOUSTON, 1428), (LAPORTE_SUN, 406), (ALDINE, 789), (LAPORTE, 162)])
@@ -143,7 +143,7 @@ def test_plain_pd_concat_gives_clear_error():
     df = pdt.read(ALDINE)
     x = pd.concat([df, df])
     with pytest.raises(AttributeError, match="pandora_tools.concat"):
-        x.meta
+        _ = x.meta
 
 
 def test_glob():

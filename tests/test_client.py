@@ -159,5 +159,6 @@ def test_dates_fallback_and_formats(client):
 
 def test_tz_aware_dates_use_utc():
     import pandas as pd
+
     from pandora_tools.client import _as_date
     assert str(_as_date(pd.Timestamp("2026-08-29 21:00", tz="America/Chicago"))) == "2026-08-30"

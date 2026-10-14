@@ -19,7 +19,7 @@ import pandas as pd
 import requests
 
 from .cache import atomic_write, resolve_cache_dir
-from .frame import PandoraFrame, concat
+from .frame import PandoraFrame
 from .parser import KNOWN_PRODUCTS
 from .reader import read
 
@@ -228,7 +228,7 @@ class PandoraClient:
         undated = df["date"].isna()
         if undated.any():
             warnings.warn(f"Could not determine the date of {int(undated.sum())} file(s); skipping: "
-                          f"{list(df.loc[undated, 'filename'])[:5]}")
+                          f"{list(df.loc[undated, 'filename'])[:5]}", stacklevel=2)
             df = df[~undated]
         df["location"], df["instrument"], df["spectrometer"] = loc, int(instrument), int(spectrometer)
         df = df[(df["date"] >= d0) & (df["date"] <= d1)]

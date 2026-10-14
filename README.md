@@ -195,11 +195,14 @@ rfus5,"Formaldehyde, direct sun (total column)"
 ## Tests
 
 ```
-pip install -e ".[test]"
-pytest
+pip install -e ".[dev]"
+pytest                # tests
+ruff check .          # lint (`ruff check --fix .` fixes most findings)
+pytest --cov          # tests + coverage report
 ```
 
 Tests use four sample files in `tests/data` and a fake API (no network needed).
+The same checks run automatically on every pull request (see Contributing).
 
 ## Contributing
 
@@ -209,7 +212,7 @@ Tests use four sample files in `tests/data` and a fake API (no network needed).
 git clone https://github.com/paulsavala/pandora-tools.git
 cd pandora-tools
 python -m venv .venv && source .venv/bin/activate     # or conda, if you prefer
-pip install -e ".[test]"
+pip install -e ".[dev]"                               # the package plus pytest, coverage and ruff
 pytest                                                # everything should pass before you change anything
 ```
 
@@ -242,5 +245,13 @@ never renamed), style, and how to test. `CLAUDE.md` simply imports it.
 ### 3. Submit
 
 Push your branch and open a pull request against `main` describing what changed
-and how you tested it. Releases are tagged (`v0.1.0`, ...) so notebooks that pin
+and how you tested it.
+
+GitHub then checks the pull request automatically. It runs the tests on three
+Python/pandas combinations, runs the `ruff` linter, and measures test coverage.
+Each check shows a green tick or a red X on the pull request. It can only be
+merged once **all tests pass** is green and a maintainer has approved it. If
+something is red, click **Details** next to it to see the failing test or lint
+message, fix it on your branch, and push again; the checks re-run on their own.
+The coverage table is on the run's **Summary** page. Releases are tagged (`v0.1.0`, ...) so notebooks that pin
 a version keep working.

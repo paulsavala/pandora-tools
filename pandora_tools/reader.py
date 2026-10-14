@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import glob
 import os
-from pathlib import Path
 from typing import Iterable, Optional, Union
 
 from .frame import PandoraFrame, concat
